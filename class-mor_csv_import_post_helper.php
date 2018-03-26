@@ -1,32 +1,10 @@
 <?php
-
-/**
- * A helper class for insert or update post data.
- *
- * @package Really Simple CSV Importer
- */
 class RSCSV_Import_Post_Helper
 {
     const CFS_PREFIX = 'cfs_';
     const SCF_PREFIX = 'scf_';
-    
-    /**
-     * @var $post WP_Post object
-     */
     private $post;
-    
-    /**
-     * @var $error WP_Error object
-     */
     private $error;
-    
-    /**
-     * Add an error or append additional message to this object.
-     *
-     * @param string|int $code Error code.
-     * @param string $message Error message.
-     * @param mixed $data Optional. Error data.
-     */
     public function addError($code, $message, $data = '')
     {
         if (!$this->isError()) {
@@ -35,12 +13,6 @@ class RSCSV_Import_Post_Helper
         }
         $this->error->add($code, $message, $data);
     }
-    
-    /**
-     * Get the error of this object
-     *
-     * @return (WP_Error)
-     */
     public function getError()
     {
         if (!$this->isError()) {
@@ -49,22 +21,10 @@ class RSCSV_Import_Post_Helper
         }
         return $this->error;
     }
-    
-    /**
-     * Check the object has some Errors.
-     *
-     * @return (bool)
-     */
     public function isError()
     {
         return is_wp_error($this->error);
     }
-    
-    /**
-     * Set WP_Post object
-     *
-     * @param (int) $post_id Post ID
-     */
     protected function setPost($post_id)
     {
         $post = get_post($post_id);
@@ -74,36 +34,16 @@ class RSCSV_Import_Post_Helper
             $this->addError('post_id_not_found', ('Provided Post ID not found.'));
         }
     }
-    
-    /**
-     * Get WP_Post object
-     *
-     * @return (WP_Post|null)
-     */
     public function getPost()
     {
         return $this->post;
     }
-    
-    /**
-     * Get object by post id.
-     *
-     * @param (int) $post_id Post ID
-     * @return (RSCSV_Import_Post_Helper)
-     */
     public static function getByID($post_id)
     {
         $object = new RSCSV_Import_Post_Helper();
         $object->setPost($post_id);
         return $object;
     }
-    
-    /**
-     * Add a post
-     *
-     * @param (array) $data An associative array of the post data
-     * @return (RSCSV_Import_Post_Helper)
-     */
     public static function add($data)
     {
         $object = new RSCSV_Import_Post_Helper();
@@ -120,12 +60,6 @@ class RSCSV_Import_Post_Helper
         }
         return $object;
     }
-    
-    /**
-     * Update post
-     *
-     * @param (array) $data An associative array of the post data
-     */
     public function update($data)
     {
         $post = $this->getPost();
@@ -143,12 +77,6 @@ class RSCSV_Import_Post_Helper
             $this->setPost($post_id);
         }
     }
-    
-    /**
-     * Set meta fields by array
-     *
-     * @param (array) $data An associative array of metadata
-     */
     public function setMeta($data)
     {
         $scf_array = array();
@@ -181,12 +109,6 @@ class RSCSV_Import_Post_Helper
         $this->scfSave($scf_array);
     }
     
-    /**
-     * A wrapper of update_post_meta
-     *
-     * @param (string) $key
-     * @param (string/array) $value
-     */
     protected function updateMeta($key, $value)
     {
         $post = $this->getPost();
@@ -196,13 +118,6 @@ class RSCSV_Import_Post_Helper
             $this->addError('post_is_not_set', ('WP_Post object is not set.'));
         }
     }
-    
-    /**
-     * A wrapper of update_field of Advanced Custom Fields
-     *
-     * @param (string) $key
-     * @param (string/array) $value
-     */
     protected function acfUpdateField($key, $value)
     {
         $post = $this->getPost();
@@ -217,12 +132,6 @@ class RSCSV_Import_Post_Helper
         }
     }
     
-    /**
-     * A wrapper of CFS()->save()
-     *
-     * @param (string) $key
-     * @param (string/array) $value
-     */
     protected function cfsSave($key, $value)
     {
         $post = $this->getPost();
@@ -238,12 +147,6 @@ class RSCSV_Import_Post_Helper
             $this->addError('post_is_not_set', ('WP_Post object is not set.'));
         }
     }
-    
-    /**
-     * A wrapper of Smart_Custom_Fields_Meta()->save()
-     *
-     * @param (array) $data
-     */
     protected function scfSave($data)
     {
         $post = $this->getPost();
@@ -264,12 +167,6 @@ class RSCSV_Import_Post_Helper
             $this->addError('post_is_not_set', ('WP_Post object is not set.'));
         }
     }
-    
-    /**
-     * A wrapper of wp_set_post_tags
-     *
-     * @param (array) $tags
-     */
     public function setPostTags($tags)
     {
         $post = $this->getPost();
@@ -279,13 +176,6 @@ class RSCSV_Import_Post_Helper
             $this->addError('post_is_not_set', ('WP_Post object is not set.'));
         }
     }
-    
-    /**
-     * A wrapper of wp_set_object_terms
-     *
-     * @param (array/string) $taxonomy The context in which to relate the term to the object
-     * @param (array/int/string) $terms The slug or id of the term
-     */
     public function setObjectTerms($taxonomy, $terms)
     {
         $post = $this->getPost();
@@ -296,13 +186,6 @@ class RSCSV_Import_Post_Helper
         }
     }
     
-    /**
-     * Add attachment file. Automatically get remote file
-     *
-     * @param (string) $file
-     * @param (array) $data
-     * @return (boolean) True on success, false on failure.
-     */
     public function addMediaFile($file, $data = null)
     {
         if (parse_url($file, PHP_URL_SCHEME)) {
@@ -316,12 +199,6 @@ class RSCSV_Import_Post_Helper
         return false;
     }
     
-    /**
-     * Add attachment file and set as thumbnail. Automatically get remote file
-     *
-     * @param (string) $file
-     * @return (boolean) True on success, false on failure.
-     */
     public function addThumbnail($file)
     {
         $post = $this->getPost();
@@ -341,13 +218,6 @@ class RSCSV_Import_Post_Helper
         return false;
     }
     
-    /**
-     * A wrapper of wp_insert_attachment and wp_update_attachment_metadata
-     *
-     * @param (string) $file
-     * @param (array) $data
-     * @return (int) Return the attachment id on success, 0 on failure.
-     */
     public function setAttachment($file, $data = array())
     {
         $post = $this->getPost();
@@ -375,15 +245,9 @@ class RSCSV_Import_Post_Helper
             wp_update_attachment_metadata($attachment_id, $attachment_metadata);
             return $attachment_id;
         }
-        // On failure
         return 0;
     }
 
-    /**
-     * A wrapper of update_attached_file
-     *
-     * @param (string) $value
-     */
     protected function updateAttachment($value)
     {
         $post = $this->getPost();
@@ -394,13 +258,6 @@ class RSCSV_Import_Post_Helper
         }
     }
 
-    /**
-     * A wrapper of wp_safe_remote_get
-     *
-     * @param (string) $url
-     * @param (array) $args
-     * @return (string) file path
-     */
     public function remoteGet($url, $args = array())
     {
         global $wp_filesystem;
@@ -429,10 +286,6 @@ class RSCSV_Import_Post_Helper
         
         return '';
     }
-    
-    /**
-     * Unset WP_Post object
-     */
     public function __destruct()
     {
         unset($this->post);
